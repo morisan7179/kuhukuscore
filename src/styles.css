@@ -2,3 +2,12 @@
   font-family: sans-serif;
   text-align: center;
 }
+.floating-buttons {
+  position: fixed;
+  bottom: 20vh; /* ← この数値で中央寄りに調整できます */
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 5vw;
+}
