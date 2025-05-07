@@ -104,22 +104,40 @@ export default function HomePage() {
         paddingBottom: "100px",
       }}
     >
-      <h1 style={{ fontSize: "6vw", textAlign: "center" }}>
-        空腹スコア・ダイエット
-      </h1>
+      {/* タイトル + ダークモード切り替え */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "20px",
+        }}
+      >
+        <h1
+          style={{
+            margin: 0,
+            fontSize: "min(5vw, 28px)",
+            whiteSpace: "nowrap",
+          }}
+        >
+          空腹スコア・ダイエット
+        </h1>
 
-      <div style={{ textAlign: "right", marginBottom: "10px" }}>
-        <label style={{ fontSize: "4vw" }}>
-          <input
-            type="checkbox"
-            checked={darkMode}
-            onChange={() => setDarkMode(!darkMode)}
-            style={{ marginRight: "10px" }}
-          />
-          ダークモード
-        </label>
+        <button
+          onClick={() => setDarkMode(!darkMode)}
+          style={{
+            fontSize: "min(6vw, 32px)",
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+          }}
+          aria-label="ダークモード切り替え"
+        >
+          {darkMode ? "🌞" : "🌙"}
+        </button>
       </div>
 
+      {/* 今日の記録 */}
       <div
         style={{
           marginBottom: "20px",
@@ -137,15 +155,23 @@ export default function HomePage() {
               [{entry.time}] {"★".repeat(entry.score)}（{entry.score}点）
               <button
                 onClick={() => deleteEntry(index)}
-                style={{ marginLeft: "10px", fontSize: "3.5vw" }}
+                style={{
+                  marginLeft: "10px",
+                  fontSize: "3.5vw",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+                aria-label="削除"
               >
-                削除
+                🗑️
               </button>
             </p>
           ))
         )}
       </div>
 
+      {/* 目標設定 */}
       <div
         style={{
           display: "flex",
@@ -165,6 +191,7 @@ export default function HomePage() {
         />
       </div>
 
+      {/* スコア追加ボタン */}
       <div
         style={{
           position: "fixed",
@@ -173,20 +200,29 @@ export default function HomePage() {
           right: 0,
           background: backgroundColor,
           borderTop: darkMode ? "1px solid #444" : "1px solid #ccc",
-          padding: "10px",
+          padding: "20px 10px",
           display: "flex",
           justifyContent: "center",
-          gap: "10px",
+          gap: "20px",
           zIndex: 1000,
         }}
       >
-        <button onClick={() => addScore(1)} style={{ fontSize: "4vw" }}>
+        <button
+          onClick={() => addScore(1)}
+          style={{ fontSize: "4vw", padding: "10px 15px" }}
+        >
           ★☆☆
         </button>
-        <button onClick={() => addScore(2)} style={{ fontSize: "4vw" }}>
+        <button
+          onClick={() => addScore(2)}
+          style={{ fontSize: "4vw", padding: "10px 15px" }}
+        >
           ★★☆
         </button>
-        <button onClick={() => addScore(3)} style={{ fontSize: "4vw" }}>
+        <button
+          onClick={() => addScore(3)}
+          style={{ fontSize: "4vw", padding: "10px 15px" }}
+        >
           ★★★
         </button>
       </div>

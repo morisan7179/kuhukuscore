@@ -96,7 +96,7 @@ export default function ProgressPage() {
           data={pieData}
           cx="50%"
           cy="50%"
-          innerRadius={60}
+          innerRadius={40}
           outerRadius={80}
           startAngle={90}
           endAngle={-270}
