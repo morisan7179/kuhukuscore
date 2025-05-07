@@ -1,98 +1,48 @@
 import React, { useState, useEffect } from "react";
 
 export default function HomePage() {
-  const [scores, setScores] = useState(() => {
-    const saved = localStorage.getItem("scores");
-    return saved ? JSON.parse(saved) : [];
-  });
   const [goal, setGoal] = useState(() => {
     const savedGoal = localStorage.getItem("goal");
     return savedGoal ? Number(savedGoal) : 300;
   });
-  const [total, setTotal] = useState(() => {
-    const savedTotal = localStorage.getItem("total");
-    return savedTotal ? Number(savedTotal) : 0;
+
+  const [scores, setScores] = useState(() => {
+    const saved = localStorage.getItem("scores");
+    return saved ? JSON.parse(saved) : [];
   });
+
+  const [total, setTotal] = useState(() => {
+    const saved = localStorage.getItem("total");
+    return saved ? Number(saved) : 0;
+  });
+
   const [todayScore, setTodayScore] = useState(() => {
     const savedToday = localStorage.getItem("todayScore");
     return savedToday ? Number(savedToday) : 0;
   });
-  const [darkMode, setDarkMode] = useState(() => {
-    const savedMode = localStorage.getItem("darkMode");
-    return savedMode ? JSON.parse(savedMode) : false;
-  });
-
-  const maxDays = 30;
-
-  const getTodayJST = () => {
-    const now = new Date();
-    now.setHours(now.getHours() + 9);
-    return now.toISOString().split("T")[0];
-  };
 
   useEffect(() => {
-    const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - maxDays + 1);
-    const filtered = scores.filter((entry) => {
-      const entryDate = new Date(entry.date);
-      entryDate.setHours(entryDate.getHours() + 9);
-      return entryDate >= cutoff;
-    });
-    if (filtered.length !== scores.length) {
-      setScores(filtered);
-    }
-
-    const todayDate = getTodayJST();
-    const savedDate = localStorage.getItem("lastRecordedDate");
-    if (savedDate !== todayDate) {
-      setTodayScore(0);
-      localStorage.setItem("lastRecordedDate", todayDate);
-    }
-
-    localStorage.setItem("scores", JSON.stringify(filtered));
+    localStorage.setItem("scores", JSON.stringify(scores));
     localStorage.setItem("goal", goal);
     localStorage.setItem("total", total);
     localStorage.setItem("todayScore", todayScore);
-    localStorage.setItem("darkMode", JSON.stringify(darkMode));
-  }, [scores, goal, total, todayScore, darkMode]);
+  }, [scores, goal, total, todayScore]);
 
   const addScore = (score) => {
-    const newTotal = total + score;
     const now = new Date();
-    now.setHours(now.getHours() + 9);
-    const newScores = [
-      ...scores,
-      {
-        time: now.toLocaleTimeString("ja-JP"),
-        score,
-        date: now.toISOString().split("T")[0],
-      },
-    ];
-    setScores(newScores);
-    setTotal(newTotal);
+    const dateStr = now.toISOString().split("T")[0];
+    const newEntry = {
+      time: now.toLocaleTimeString("ja-JP"),
+      score,
+      date: dateStr,
+    };
+    setScores([...scores, newEntry]);
+    setTotal(total + score);
     setTodayScore(todayScore + score);
-    localStorage.setItem("lastRecordedDate", now.toISOString().split("T")[0]);
   };
-
-  const deleteEntry = (indexToDelete) => {
-    const entryToDelete = scores[indexToDelete];
-    const newScores = scores.filter((_, i) => i !== indexToDelete);
-    setScores(newScores);
-    setTotal(total - entryToDelete.score);
-    if (entryToDelete.date === getTodayJST()) {
-      setTodayScore(todayScore - entryToDelete.score);
-    }
-  };
-
-  const totalToday = scores
-    .filter((e) => e.date === getTodayJST())
-    .reduce((sum, entry) => sum + entry.score, 0);
-
-  const backgroundColor = darkMode ? "#121212" : "#ffffff";
-  const textColor = darkMode ? "#f0f0f0" : "#000000";
-  const boxColor = darkMode ? "#1e1e1e" : "#f9f9f9";
 
   return (
+
     <div
       style={{
         backgroundColor,
