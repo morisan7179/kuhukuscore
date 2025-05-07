@@ -1,26 +1,11 @@
 import React, { useState, useEffect } from "react";
 
 export default function HomePage() {
-  const [scores, setScores] = useState(() => {
-    const saved = localStorage.getItem("scores");
-    return saved ? JSON.parse(saved) : [];
-  });
-  const [goal, setGoal] = useState(() => {
-    const savedGoal = localStorage.getItem("goal");
-    return savedGoal ? Number(savedGoal) : 300;
-  });
-  const [total, setTotal] = useState(() => {
-    const savedTotal = localStorage.getItem("total");
-    return savedTotal ? Number(savedTotal) : 0;
-  });
-  const [todayScore, setTodayScore] = useState(() => {
-    const savedToday = localStorage.getItem("todayScore");
-    return savedToday ? Number(savedToday) : 0;
-  });
-  const [darkMode, setDarkMode] = useState(() => {
-    const savedMode = localStorage.getItem("darkMode");
-    return savedMode ? JSON.parse(savedMode) : false;
-  });
+  const [scores, setScores] = useState([]);
+  const [goal, setGoal] = useState(300);
+  const [total, setTotal] = useState(0);
+  const [todayScore, setTodayScore] = useState(0);
+  const [darkMode, setDarkMode] = useState(false);
 
   const maxDays = 30;
 
@@ -31,13 +16,33 @@ export default function HomePage() {
   };
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const savedScores = localStorage.getItem("scores");
+    const savedGoal = localStorage.getItem("goal");
+    const savedTotal = localStorage.getItem("total");
+    const savedToday = localStorage.getItem("todayScore");
+    const savedMode = localStorage.getItem("darkMode");
+
+    setScores(savedScores ? JSON.parse(savedScores) : []);
+    setGoal(savedGoal ? Number(savedGoal) : 300);
+    setTotal(savedTotal ? Number(savedTotal) : 0);
+    setTodayScore(savedToday ? Number(savedToday) : 0);
+    setDarkMode(savedMode ? JSON.parse(savedMode) : false);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - maxDays + 1);
+
     const filtered = scores.filter((entry) => {
       const entryDate = new Date(entry.date);
       entryDate.setHours(entryDate.getHours() + 9);
       return entryDate >= cutoff;
     });
+
     if (filtered.length !== scores.length) {
       setScores(filtered);
     }
@@ -50,9 +55,9 @@ export default function HomePage() {
     }
 
     localStorage.setItem("scores", JSON.stringify(filtered));
-    localStorage.setItem("goal", goal);
-    localStorage.setItem("total", total);
-    localStorage.setItem("todayScore", todayScore);
+    localStorage.setItem("goal", goal.toString());
+    localStorage.setItem("total", total.toString());
+    localStorage.setItem("todayScore", todayScore.toString());
     localStorage.setItem("darkMode", JSON.stringify(darkMode));
   }, [scores, goal, total, todayScore, darkMode]);
 
@@ -122,7 +127,6 @@ export default function HomePage() {
         >
           空腹スコア・ダイエット
         </h1>
-
         <button
           onClick={() => setDarkMode(!darkMode)}
           style={{
