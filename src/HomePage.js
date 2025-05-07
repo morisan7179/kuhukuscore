@@ -88,7 +88,7 @@ export default function HomePage() {
     .filter((e) => e.date === getTodayJST())
     .reduce((sum, entry) => sum + entry.score, 0);
 
-  // ✅ スタイル変数は return より前で定義！
+  // ✅ ここが return の直前に必要
   const backgroundColor = darkMode ? "#121212" : "#ffffff";
   const textColor = darkMode ? "#f0f0f0" : "#000000";
   const boxColor = darkMode ? "#1e1e1e" : "#f9f9f9";
