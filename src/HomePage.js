@@ -26,8 +26,7 @@ export default function HomePage() {
 
   const getTodayJST = () => {
     const now = new Date();
-    now.setHours(now.getHours() + 9); // JST補正
-    return now.toISOString().split("T")[0];
+    return now.toLocaleDateString("ja-JP").replaceAll("/", "-");
   };
 
   useEffect(() => {
@@ -35,7 +34,6 @@ export default function HomePage() {
     cutoff.setDate(cutoff.getDate() - maxDays + 1);
     const filtered = scores.filter((entry) => {
       const entryDate = new Date(entry.date);
-      entryDate.setHours(entryDate.getHours() + 9);
       return entryDate >= cutoff;
     });
     if (filtered.length !== scores.length) {
@@ -57,26 +55,29 @@ export default function HomePage() {
   }, [scores, goal, total, todayScore, darkMode]);
 
   const addScore = (score) => {
-  const newTotal = total + score;
-  const now = new Date();
-  now.setHours(now.getHours() + 9); // JST補正
+    const newTotal = total + score;
+    const now = new Date();
 
-  const time = now.toISOString().split("T")[1].split(".")[0]; // ← 修正済み！
+    const date = now.toLocaleDateString("ja-JP").replaceAll("/", "-");
+    const time = now.toLocaleTimeString("ja-JP", {
+      hour12: false,
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
 
-  const newScores = [
-    ...scores,
-    {
-      time,
-      score,
-      date: now.toISOString().split("T")[0],
-    },
-  ];
-  setScores(newScores);
-  setTotal(newTotal);
-  setTodayScore(todayScore + score);
-  localStorage.setItem("lastRecordedDate", now.toISOString().split("T")[0]);
-};
-
+    const newScores = [
+      ...scores,
+      {
+        time,
+        score,
+        date,
+      },
+    ];
+    setScores(newScores);
+    setTotal(newTotal);
+    setTodayScore(todayScore + score);
+    localStorage.setItem("lastRecordedDate", date);
   };
 
   const deleteEntry = (indexToDelete) => {
