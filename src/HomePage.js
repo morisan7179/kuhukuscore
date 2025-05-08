@@ -33,9 +33,7 @@ export default function HomePage() {
 
   const maxDays = 30;
 
-  // 🎯 JSTで正確な日付を取得する関数
   const getTodayJST = () => {
-
     const now = new Date();
     const jst = new Date(
       now.getTime() + now.getTimezoneOffset() * 60000 + 9 * 3600000
@@ -44,7 +42,6 @@ export default function HomePage() {
     const mm = String(jst.getMonth() + 1).padStart(2, "0");
     const dd = String(jst.getDate()).padStart(2, "0");
     return `${yyyy}-${mm}-${dd}`;
-
   };
 
   useEffect(() => {
@@ -70,20 +67,23 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("goal", goal);
-  }, [goal]);
+    try {
+      localStorage.setItem("test", "1");
+      const test = localStorage.getItem("test");
+      if (test !== "1") {
+        console.warn("localStorage 書き込み確認に失敗");
+        return;
+      }
 
-  useEffect(() => {
-    localStorage.setItem("total", total);
-  }, [total]);
-
-  useEffect(() => {
-    localStorage.setItem("todayScore", todayScore);
-  }, [todayScore]);
-
-  useEffect(() => {
-    localStorage.setItem("darkMode", JSON.stringify(darkMode));
-  }, [darkMode]);
+      localStorage.setItem("goal", goal);
+      localStorage.setItem("total", total);
+      localStorage.setItem("todayScore", todayScore);
+      localStorage.setItem("darkMode", JSON.stringify(darkMode));
+      localStorage.setItem("scores", JSON.stringify(scores));
+    } catch (e) {
+      console.error("localStorage 保存に失敗:", e);
+    }
+  }, [scores, goal, total, todayScore, darkMode]);
 
   const addScore = (score) => {
     const newTotal = total + score;
@@ -103,7 +103,6 @@ export default function HomePage() {
     setTotal(newTotal);
     setTodayScore(todayScore + score);
     localStorage.setItem("lastRecordedDate", jstDate);
-
   };
 
   const deleteEntry = (indexToDelete) => {
@@ -125,7 +124,6 @@ export default function HomePage() {
   const boxColor = darkMode ? "#1e1e1e" : "#f9f9f9";
 
   return (
-
     <div
       style={{
         backgroundColor,
@@ -152,10 +150,16 @@ export default function HomePage() {
         >
           {darkMode ? "☀️" : "🌙"}
         </span>
-
       </div>
 
-      <div style={{ marginBottom: "20px", background: boxColor, padding: "15px", borderRadius: "8px" }}>
+      <div
+        style={{
+          marginBottom: "20px",
+          background: boxColor,
+          padding: "15px",
+          borderRadius: "8px",
+        }}
+      >
         <h2 style={{ fontSize: "5vw" }}>今日の記録（合計: {totalToday}点）</h2>
         {scores.length === 0 ? (
           <p style={{ fontSize: "4vw" }}>まだ記録がありません。</p>
@@ -163,7 +167,17 @@ export default function HomePage() {
           scores.map((entry, index) => (
             <p key={index} style={{ fontSize: "4vw" }}>
               [{entry.time}] {"★".repeat(entry.score)}（{entry.score}点）
-              <button onClick={() => deleteEntry(index)} style={{ marginLeft: "10px", fontSize: "3.5vw", background: "none", border: "none", cursor: "pointer" }} aria-label="削除">
+              <button
+                onClick={() => deleteEntry(index)}
+                style={{
+                  marginLeft: "10px",
+                  fontSize: "3.5vw",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+                aria-label="削除"
+              >
                 🗑️
               </button>
             </p>
@@ -171,11 +185,24 @@ export default function HomePage() {
         )}
       </div>
 
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", alignItems: "center", justifyContent: "center" }}>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "10px",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         <label style={{ fontSize: "4vw" }}>目標：</label>
-        <input type="number" value={goal} onChange={(e) => setGoal(Number(e.target.value))} placeholder="目標スコアを入力" style={{ padding: "10px", fontSize: "4vw", width: "40vw" }} />
+        <input
+          type="number"
+          value={goal}
+          onChange={(e) => setGoal(Number(e.target.value))}
+          placeholder="目標スコアを入力"
+          style={{ padding: "10px", fontSize: "4vw", width: "40vw" }}
+        />
       </div>
-
 
       <div
         style={{
@@ -202,7 +229,6 @@ export default function HomePage() {
         <button onClick={() => addScore(3)} style={{ fontSize: "6vw" }}>
           ★★★
         </button>
-
       </div>
     </div>
   );
