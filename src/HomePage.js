@@ -26,7 +26,7 @@ export default function HomePage() {
 
   const getTodayJST = () => {
     const now = new Date();
-    now.setHours(now.getHours() + 9);
+    now.setHours(now.getHours() + 9); // JST補正
     return now.toISOString().split("T")[0];
   };
 
@@ -59,11 +59,13 @@ export default function HomePage() {
   const addScore = (score) => {
     const newTotal = total + score;
     const now = new Date();
-    now.setHours(now.getHours() + 9);
+    now.setHours(now.getHours() + 9); // JST補正
+    const time = now.toTimeString().split(" ")[0]; // ← 時刻を HH:MM:SS に
+
     const newScores = [
       ...scores,
       {
-        time: now.toLocaleTimeString("ja-JP"),
+        time,
         score,
         date: now.toISOString().split("T")[0],
       },
@@ -88,7 +90,6 @@ export default function HomePage() {
     .filter((e) => e.date === getTodayJST())
     .reduce((sum, entry) => sum + entry.score, 0);
 
-  // ✅ ここが return の直前に必要
   const backgroundColor = darkMode ? "#121212" : "#ffffff";
   const textColor = darkMode ? "#f0f0f0" : "#000000";
   const boxColor = darkMode ? "#1e1e1e" : "#f9f9f9";
@@ -105,7 +106,6 @@ export default function HomePage() {
         paddingBottom: "100px",
       }}
     >
-      {/* タイトル + ダークモード切り替え */}
       <div
         style={{
           display: "flex",
@@ -123,7 +123,6 @@ export default function HomePage() {
         >
           空腹スコア・ダイエット
         </h1>
-
         <button
           onClick={() => setDarkMode(!darkMode)}
           style={{
@@ -138,7 +137,6 @@ export default function HomePage() {
         </button>
       </div>
 
-      {/* 今日の記録 */}
       <div
         style={{
           marginBottom: "20px",
@@ -172,7 +170,6 @@ export default function HomePage() {
         )}
       </div>
 
-      {/* 目標設定 */}
       <div
         style={{
           display: "flex",
@@ -192,7 +189,6 @@ export default function HomePage() {
         />
       </div>
 
-      {/* スコア追加ボタン */}
       <div
         style={{
           position: "fixed",
