@@ -33,8 +33,18 @@ export default function HomePage() {
 
   const maxDays = 30;
 
+  // 🎯 JSTで正確な日付を取得する関数
   const getTodayJST = () => {
-    return new Date().toISOString().split("T")[0];
+
+    const now = new Date();
+    const jst = new Date(
+      now.getTime() + now.getTimezoneOffset() * 60000 + 9 * 3600000
+    );
+    const yyyy = jst.getFullYear();
+    const mm = String(jst.getMonth() + 1).padStart(2, "0");
+    const dd = String(jst.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+
   };
 
   useEffect(() => {
@@ -78,19 +88,22 @@ export default function HomePage() {
   const addScore = (score) => {
     const newTotal = total + score;
     const now = new Date();
-    const date = now.toISOString().split("T")[0];
-    const time = now.toLocaleTimeString("ja-JP", {
-      hour12: false,
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    });
 
-    const newScores = [...scores, { date, time, score }];
+    const jstDate = getTodayJST();
+
+    const newScores = [
+      ...scores,
+      {
+        time: now.toLocaleTimeString("ja-JP"),
+        score,
+        date: jstDate,
+      },
+    ];
     setScores(newScores);
     setTotal(newTotal);
     setTodayScore(todayScore + score);
-    localStorage.setItem("lastRecordedDate", date);
+    localStorage.setItem("lastRecordedDate", jstDate);
+
   };
 
   const deleteEntry = (indexToDelete) => {
@@ -112,12 +125,34 @@ export default function HomePage() {
   const boxColor = darkMode ? "#1e1e1e" : "#f9f9f9";
 
   return (
-    <div style={{ backgroundColor, color: textColor, minHeight: "100vh", padding: "5vw", maxWidth: "90vw", margin: "auto", paddingBottom: "100px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-        <h1 style={{ margin: 0, fontSize: "min(5vw, 28px)", whiteSpace: "nowrap" }}>空腹スコア・ダイエット</h1>
-        <button onClick={() => setDarkMode(!darkMode)} style={{ fontSize: "min(6vw, 32px)", background: "none", border: "none", cursor: "pointer" }} aria-label="ダークモード切り替え">
-          {darkMode ? "🌞" : "🌙"}
-        </button>
+
+    <div
+      style={{
+        backgroundColor,
+        color: textColor,
+        minHeight: "100vh",
+        padding: "5vw",
+        maxWidth: "90vw",
+        margin: "auto",
+        paddingBottom: "100px",
+      }}
+    >
+      <h1 style={{ fontSize: "6vw", textAlign: "center" }}>
+        空腹スコア・ダイエット
+      </h1>
+
+      <div style={{ textAlign: "right", marginBottom: "10px" }}>
+        <span
+          onClick={() => setDarkMode(!darkMode)}
+          style={{
+            fontSize: "5vw",
+            cursor: "pointer",
+            userSelect: "none",
+          }}
+        >
+          {darkMode ? "☀️" : "🌙"}
+        </span>
+
       </div>
 
       <div style={{ marginBottom: "20px", background: boxColor, padding: "15px", borderRadius: "8px" }}>
@@ -141,10 +176,33 @@ export default function HomePage() {
         <input type="number" value={goal} onChange={(e) => setGoal(Number(e.target.value))} placeholder="目標スコアを入力" style={{ padding: "10px", fontSize: "4vw", width: "40vw" }} />
       </div>
 
-      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: backgroundColor, borderTop: darkMode ? "1px solid #444" : "1px solid #ccc", padding: "20px 10px", display: "flex", justifyContent: "center", gap: "20px", zIndex: 1000 }}>
-        <button onClick={() => addScore(1)} style={{ fontSize: "5vw", padding: "10px 15px" }}>★☆☆</button>
-        <button onClick={() => addScore(2)} style={{ fontSize: "5vw", padding: "10px 15px" }}>★★☆</button>
-        <button onClick={() => addScore(3)} style={{ fontSize: "5vw", padding: "10px 15px" }}>★★★</button>
+
+      <div
+        style={{
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          background: backgroundColor,
+          borderTop: darkMode ? "1px solid #444" : "1px solid #ccc",
+          padding: "20px 10px",
+          minHeight: "70px",
+          display: "flex",
+          justifyContent: "center",
+          gap: "10px",
+          zIndex: 1000,
+        }}
+      >
+        <button onClick={() => addScore(1)} style={{ fontSize: "6vw" }}>
+          ★☆☆
+        </button>
+        <button onClick={() => addScore(2)} style={{ fontSize: "6vw" }}>
+          ★★☆
+        </button>
+        <button onClick={() => addScore(3)} style={{ fontSize: "6vw" }}>
+          ★★★
+        </button>
+
       </div>
     </div>
   );
