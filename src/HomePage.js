@@ -24,10 +24,16 @@ export default function HomePage() {
 
   const maxDays = 30;
 
+  // 🎯 JSTで正確な日付を取得する関数
   const getTodayJST = () => {
     const now = new Date();
-    now.setHours(now.getHours() + 9);
-    return now.toISOString().split("T")[0];
+    const jst = new Date(
+      now.getTime() + now.getTimezoneOffset() * 60000 + 9 * 3600000
+    );
+    const yyyy = jst.getFullYear();
+    const mm = String(jst.getMonth() + 1).padStart(2, "0");
+    const dd = String(jst.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
   };
 
   useEffect(() => {
@@ -35,7 +41,6 @@ export default function HomePage() {
     cutoff.setDate(cutoff.getDate() - maxDays + 1);
     const filtered = scores.filter((entry) => {
       const entryDate = new Date(entry.date);
-      entryDate.setHours(entryDate.getHours() + 9);
       return entryDate >= cutoff;
     });
     if (filtered.length !== scores.length) {
@@ -59,19 +64,20 @@ export default function HomePage() {
   const addScore = (score) => {
     const newTotal = total + score;
     const now = new Date();
-    now.setHours(now.getHours() + 9);
+    const jstDate = getTodayJST();
+
     const newScores = [
       ...scores,
       {
         time: now.toLocaleTimeString("ja-JP"),
         score,
-        date: now.toISOString().split("T")[0],
+        date: jstDate,
       },
     ];
     setScores(newScores);
     setTotal(newTotal);
     setTodayScore(todayScore + score);
-    localStorage.setItem("lastRecordedDate", now.toISOString().split("T")[0]);
+    localStorage.setItem("lastRecordedDate", jstDate);
   };
 
   const deleteEntry = (indexToDelete) => {
@@ -109,15 +115,16 @@ export default function HomePage() {
       </h1>
 
       <div style={{ textAlign: "right", marginBottom: "10px" }}>
-        <label style={{ fontSize: "4vw" }}>
-          <input
-            type="checkbox"
-            checked={darkMode}
-            onChange={() => setDarkMode(!darkMode)}
-            style={{ marginRight: "10px" }}
-          />
-          ダークモード
-        </label>
+        <span
+          onClick={() => setDarkMode(!darkMode)}
+          style={{
+            fontSize: "5vw",
+            cursor: "pointer",
+            userSelect: "none",
+          }}
+        >
+          {darkMode ? "☀️" : "🌙"}
+        </span>
       </div>
 
       <div
@@ -173,20 +180,21 @@ export default function HomePage() {
           right: 0,
           background: backgroundColor,
           borderTop: darkMode ? "1px solid #444" : "1px solid #ccc",
-          padding: "10px",
+          padding: "20px 10px",
+          minHeight: "70px",
           display: "flex",
           justifyContent: "center",
           gap: "10px",
           zIndex: 1000,
         }}
       >
-        <button onClick={() => addScore(1)} style={{ fontSize: "4vw" }}>
+        <button onClick={() => addScore(1)} style={{ fontSize: "6vw" }}>
           ★☆☆
         </button>
-        <button onClick={() => addScore(2)} style={{ fontSize: "4vw" }}>
+        <button onClick={() => addScore(2)} style={{ fontSize: "6vw" }}>
           ★★☆
         </button>
-        <button onClick={() => addScore(3)} style={{ fontSize: "4vw" }}>
+        <button onClick={() => addScore(3)} style={{ fontSize: "6vw" }}>
           ★★★
         </button>
       </div>
