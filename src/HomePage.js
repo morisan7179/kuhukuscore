@@ -57,23 +57,26 @@ export default function HomePage() {
   }, [scores, goal, total, todayScore, darkMode]);
 
   const addScore = (score) => {
-    const newTotal = total + score;
-    const now = new Date();
-    now.setHours(now.getHours() + 9); // JST補正
-    const time = now.toTimeString().split(" ")[0]; // ← 時刻を HH:MM:SS に
+  const newTotal = total + score;
+  const now = new Date();
+  now.setHours(now.getHours() + 9); // JST補正
 
-    const newScores = [
-      ...scores,
-      {
-        time,
-        score,
-        date: now.toISOString().split("T")[0],
-      },
-    ];
-    setScores(newScores);
-    setTotal(newTotal);
-    setTodayScore(todayScore + score);
-    localStorage.setItem("lastRecordedDate", now.toISOString().split("T")[0]);
+  const time = now.toISOString().split("T")[1].split(".")[0]; // ← 修正済み！
+
+  const newScores = [
+    ...scores,
+    {
+      time,
+      score,
+      date: now.toISOString().split("T")[0],
+    },
+  ];
+  setScores(newScores);
+  setTotal(newTotal);
+  setTodayScore(todayScore + score);
+  localStorage.setItem("lastRecordedDate", now.toISOString().split("T")[0]);
+};
+
   };
 
   const deleteEntry = (indexToDelete) => {
