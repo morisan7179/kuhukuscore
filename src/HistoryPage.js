@@ -7,12 +7,27 @@ import {
 export default function HistoryPage() {
   const [scores, setScores] = useState([]);
   const [darkMode, setDarkMode] = useState(() => {
-    return JSON.parse(localStorage.getItem("darkMode")) || false;
+    try {
+      return JSON.parse(localStorage.getItem("darkMode")) || false;
+    } catch {
+      return false;
+    }
   });
   const [reverse, setReverse] = useState(false);
-　
+
   const loadScores = () => {
-    setScores(JSON.parse(localStorage.getItem("scores") || "[]"));
+    try {
+      const raw = localStorage.getItem("scores");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) setScores(parsed);
+        else setScores([]);
+      } else {
+        setScores([]);
+      }
+    } catch {
+      setScores([]);
+    }
   };
 
   useEffect(() => {
