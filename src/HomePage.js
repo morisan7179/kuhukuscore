@@ -31,13 +31,13 @@ export default function HomePage() {
     return savedMode ? JSON.parse(savedMode) : false;
   });
 
+  // ⭐ 新規追加：selectedDate
+  const getTodayJST = () => new Date().toISOString().split("T")[0];
+  const [selectedDate, setSelectedDate] = useState(getTodayJST);
+
   const maxDays = 30;
 
-  const getTodayJST = () => {
-    return new Date().toISOString().split("T")[0];
-  };
-
-  // ⭐ 新規追加：日付監視
+  // 日付監視
   useEffect(() => {
     const checkDateChange = () => {
       const todayDate = getTodayJST();
@@ -48,11 +48,12 @@ export default function HomePage() {
       }
     };
 
-    checkDateChange(); // 初回
-    const intervalId = setInterval(checkDateChange, 60000); // 1分ごと監視
+    checkDateChange();
+    const intervalId = setInterval(checkDateChange, 60000);
     return () => clearInterval(intervalId);
   }, []);
 
+  // 過去データ削除
   useEffect(() => {
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - maxDays + 1);
@@ -67,33 +68,18 @@ export default function HomePage() {
       localStorage.setItem("scores", JSON.stringify(filtered));
     }
 
-    // 初回のみ lastRecordedDate を設定
-    const todayDate = getTodayJST();
     if (!localStorage.getItem("lastRecordedDate")) {
-      localStorage.setItem("lastRecordedDate", todayDate);
+      localStorage.setItem("lastRecordedDate", getTodayJST());
     }
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem("goal", goal);
-  }, [goal]);
-
-  useEffect(() => {
-    localStorage.setItem("total", total);
-  }, [total]);
-
-  useEffect(() => {
-    localStorage.setItem("todayScore", todayScore);
-  }, [todayScore]);
-
-  useEffect(() => {
-    localStorage.setItem("darkMode", JSON.stringify(darkMode));
-  }, [darkMode]);
+  useEffect(() => localStorage.setItem("goal", goal), [goal]);
+  useEffect(() => localStorage.setItem("total", total), [total]);
+  useEffect(() => localStorage.setItem("todayScore", todayScore), [todayScore]);
+  useEffect(() => localStorage.setItem("darkMode", JSON.stringify(darkMode)), [darkMode]);
 
   const addScore = (score) => {
-    const newTotal = total + score;
     const now = new Date();
-    const date = now.toISOString().split("T")[0];
     const time = now.toLocaleTimeString("ja-JP", {
       hour12: false,
       hour: "2-digit",
@@ -101,11 +87,13 @@ export default function HomePage() {
       second: "2-digit",
     });
 
-    const newScores = [...scores, { date, time, score }];
+    const newScores = [...scores, { date: selectedDate, time, score }];
     setScores(newScores);
-    setTotal(newTotal);
-    setTodayScore(todayScore + score);
-    localStorage.setItem("lastRecordedDate", date);
+    setTotal(total + score);
+    if (selectedDate === getTodayJST()) {
+      setTodayScore(todayScore + score);
+    }
+    localStorage.setItem("lastRecordedDate", getTodayJST());
   };
 
   const deleteEntry = (indexToDelete) => {
@@ -118,9 +106,9 @@ export default function HomePage() {
     }
   };
 
-  const totalToday = scores
-    .filter((e) => e.date === getTodayJST())
-    .reduce((sum, entry) => sum + (Number(entry.score) || 0), 0);
+  const entriesForSelectedDate = scores
+    .map((entry, index) => ({ ...entry, index }))
+    .filter((e) => e.date === selectedDate);
 
   const backgroundColor = darkMode ? "#121212" : "#ffffff";
   const textColor = darkMode ? "#f0f0f0" : "#000000";
@@ -135,21 +123,24 @@ export default function HomePage() {
         </button>
       </div>
 
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "10px" }}>
+        <label style={{ fontSize: "4vw", marginRight: "10px" }}>📅 日付選択:</label>
+        <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} style={{ fontSize: "4vw", padding: "5px" }} />
+      </div>
+
       <div style={{ marginBottom: "20px", background: boxColor, padding: "15px", borderRadius: "8px" }}>
-        <h2 style={{ fontSize: "5vw" }}>今日の記録（合計: {totalToday}点）</h2>
-        {scores.filter((e) => e.date === getTodayJST()).length === 0 ? (
+        <h2 style={{ fontSize: "5vw" }}>{selectedDate === getTodayJST() ? "今日" : selectedDate} の記録</h2>
+        {entriesForSelectedDate.length === 0 ? (
           <p style={{ fontSize: "4vw" }}>まだ記録がありません。</p>
         ) : (
-          scores
-            .filter((e) => e.date === getTodayJST())
-            .map((entry, index) => (
-              <p key={index} style={{ fontSize: "4vw" }}>
-                [{entry.time}] {"★".repeat(entry.score)}（{entry.score}点）
-                <button onClick={() => deleteEntry(index)} style={{ marginLeft: "10px", fontSize: "3.5vw", background: "none", border: "none", cursor: "pointer" }} aria-label="削除">
-                  🗑️
-                </button>
-              </p>
-            ))
+          entriesForSelectedDate.map((entry) => (
+            <p key={entry.index} style={{ fontSize: "4vw" }}>
+              [{entry.time}] {"★".repeat(entry.score)}（{entry.score}点）
+              <button onClick={() => deleteEntry(entry.index)} style={{ marginLeft: "10px", fontSize: "3.5vw", background: "none", border: "none", cursor: "pointer" }} aria-label="削除">
+                🗑️
+              </button>
+            </p>
+          ))
         )}
       </div>
 
