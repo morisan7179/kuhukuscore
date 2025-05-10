@@ -31,17 +31,8 @@ export default function HomePage() {
     return savedMode ? JSON.parse(savedMode) : false;
   });
 
-  const themes = {
-    light: { background: "#ffffff", text: "#000000", box: "#f9f9f9", font: "Arial, sans-serif" },
-    dark: { background: "#121212", text: "#f0f0f0", box: "#1e1e1e", font: "Roboto, sans-serif" },
-    blue: { background: "#e0f7fa", text: "#004d40", box: "#b2ebf2", font: "'Comic Sans MS', cursive, sans-serif" }
-  };
-  const [selectedTheme, setSelectedTheme] = useState(() => localStorage.getItem("theme") || "light");
-  useEffect(() => localStorage.setItem("theme", selectedTheme), [selectedTheme]);
-
   const getTodayJST = () => new Date().toISOString().split("T")[0];
 
-  // ⭐ localStorageで保持
   const [selectedDate, setSelectedDate] = useState(() => localStorage.getItem("selectedDate") || getTodayJST());
   useEffect(() => localStorage.setItem("selectedDate", selectedDate), [selectedDate]);
 
@@ -98,14 +89,12 @@ export default function HomePage() {
   };
 
   const entriesForSelectedDate = scores.map((entry, index) => ({ ...entry, index })).filter((e) => e.date === selectedDate);
-  const theme = themes[selectedTheme];
-  const backgroundColor = theme.background;
-  const textColor = theme.text;
-  const boxColor = theme.box;
-  const fontFamily = theme.font;
+  const backgroundColor = darkMode ? "#121212" : "#ffffff";
+  const textColor = darkMode ? "#f0f0f0" : "#000000";
+  const boxColor = darkMode ? "#1e1e1e" : "#f9f9f9";
 
   return (
-    <div style={{ backgroundColor, color: textColor, fontFamily, minHeight: "100vh", padding: "5vw", maxWidth: "90vw", margin: "auto", paddingBottom: "100px" }}>
+    <div style={{ backgroundColor, color: textColor, minHeight: "100vh", padding: "5vw", maxWidth: "90vw", margin: "auto", paddingBottom: "100px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
         <h1 style={{ margin: 0, fontSize: "min(5vw, 28px)", whiteSpace: "nowrap" }}>空腹スコア・ダイエット</h1>
         <button onClick={() => setDarkMode(!darkMode)} style={{ fontSize: "min(6vw, 32px)", background: "none", border: "none", cursor: "pointer" }} aria-label="ダークモード切り替え">
@@ -116,13 +105,6 @@ export default function HomePage() {
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "10px" }}>
         <label style={{ fontSize: "4vw", marginRight: "10px" }}>📅 日付選択:</label>
         <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} style={{ fontSize: "4vw", padding: "5px" }} />
-      </div>
-
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "20px" }}>
-        <label style={{ fontSize: "4vw", marginRight: "10px" }}>🎨 テーマ:</label>
-        <select value={selectedTheme} onChange={(e) => setSelectedTheme(e.target.value)} style={{ fontSize: "4vw", padding: "5px" }}>
-          {Object.keys(themes).map((key) => (<option key={key} value={key}>{key}</option>))}
-        </select>
       </div>
 
       <div style={{ marginBottom: "20px", background: boxColor, padding: "15px", borderRadius: "8px" }}>
