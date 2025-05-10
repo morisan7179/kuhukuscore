@@ -1,6 +1,4 @@
-// public/service-worker.js
-
-const CACHE_NAME = "kuhukuscore-cache-v1";
+const CACHE_NAME = "kuhukuscore-cache-v2";  // ★バージョンを更新
 const urlsToCache = [
   "/",
   "/index.html",
@@ -38,7 +36,15 @@ self.addEventListener("activate", function (event) {
 self.addEventListener("fetch", function (event) {
   event.respondWith(
     caches.match(event.request).then(function (response) {
-      return response || fetch(event.request);
+      if (response) {
+        return response;
+      }
+      return fetch(event.request).catch(() => {
+        // オフライン時にnavigateリクエストならindex.htmlを返す
+        if (event.request.mode === "navigate") {
+          return caches.match("/index.html");
+        }
+      });
     })
   );
 });
