@@ -1,4 +1,4 @@
-const CACHE_NAME = "kuhukuscore-cache-v2";  // ★バージョンを更新
+const CACHE_NAME = "kuhukuscore-cache-v2"; // ★バージョンUP必須
 const urlsToCache = [
   "/",
   "/index.html",
@@ -8,43 +8,42 @@ const urlsToCache = [
 ];
 
 // インストール時にキャッシュ
-self.addEventListener("install", function (event) {
+self.addEventListener("install", (event) => {
   console.log("[ServiceWorker] Install");
   event.waitUntil(
-    caches.open(CACHE_NAME).then(function (cache) {
-      return cache.addAll(urlsToCache);
-    })
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(urlsToCache))
   );
   self.skipWaiting();
 });
 
-// アクティベート時に古いキャッシュを削除
-self.addEventListener("activate", function (event) {
+// アクティベート時に古いキャッシュ削除
+self.addEventListener("activate", (event) => {
   console.log("[ServiceWorker] Activate");
   event.waitUntil(
-    caches.keys().then(function (cacheNames) {
-      return Promise.all(
+    caches.keys().then((cacheNames) =>
+      Promise.all(
         cacheNames
-          .filter(name => name !== CACHE_NAME)
-          .map(name => caches.delete(name))
-      );
-    })
+          .filter((name) => name !== CACHE_NAME)
+          .map((name) => caches.delete(name))
+      )
+    )
   );
+  self.clients.claim();
 });
 
-// フェッチ時にキャッシュ or ネットワーク
-self.addEventListener("fetch", function (event) {
+// fetch時にキャッシュ or ネット or fallback
+self.addEventListener("fetch", (event) => {
   event.respondWith(
-    caches.match(event.request).then(function (response) {
-      if (response) {
-        return response;
-      }
-      return fetch(event.request).catch(() => {
-        // オフライン時にnavigateリクエストならindex.htmlを返す
-        if (event.request.mode === "navigate") {
+    caches.match(event.request).then((response) => {
+      if (response) return response;
+      return fetch(event.request)
+        .then((res) => {
+          return res;
+        })
+        .catch(() => {
+          // ネットもキャッシュも無い場合はindex.htmlを返してSPA壊さない
           return caches.match("/index.html");
-        }
-      });
+        });
     })
   );
 });
