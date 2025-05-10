@@ -1,25 +1,18 @@
 import React, { useState, useEffect } from "react";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  CartesianGrid,
+  BarChart, Bar, XAxis, YAxis, Tooltip,
+  ResponsiveContainer, CartesianGrid,
 } from "recharts";
 
 export default function HistoryPage() {
   const [scores, setScores] = useState([]);
   const [darkMode, setDarkMode] = useState(() => {
-    const savedMode = localStorage.getItem("darkMode");
-    return savedMode ? JSON.parse(savedMode) : false;
+    return JSON.parse(localStorage.getItem("darkMode")) || false;
   });
   const [reverse, setReverse] = useState(false);
 
   const loadScores = () => {
-    const saved = localStorage.getItem("scores");
-    if (saved) setScores(JSON.parse(saved));
+    setScores(JSON.parse(localStorage.getItem("scores") || "[]"));
   };
 
   useEffect(() => {
@@ -55,12 +48,12 @@ export default function HistoryPage() {
     }
   };
 
-  const backgroundColor = darkMode ? "#121212" : "#ffffff";
-  const textColor = darkMode ? "#f0f0f0" : "#000000";
-  const boxColor = darkMode ? "#1e1e1e" : "#f9f9f9";
+  const bg = darkMode ? "#121212" : "#fff";
+  const text = darkMode ? "#f0f0f0" : "#000";
+  const box = darkMode ? "#1e1e1e" : "#f9f9f9";
 
   return (
-    <div style={{ backgroundColor, color: textColor, padding: "5vw", maxWidth: "90vw", margin: "auto", minHeight: "100vh", paddingBottom: "100px" }}>
+    <div style={{ backgroundColor: bg, color: text, padding: "5vw", maxWidth: "90vw", margin: "auto", minHeight: "100vh", paddingBottom: "100px" }}>
       <h1 style={{ fontSize: "6vw", textAlign: "center" }}>📅 記録履歴</h1>
 
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
@@ -73,9 +66,9 @@ export default function HistoryPage() {
         <ResponsiveContainer width="100%" height={200}>
           <BarChart data={dailyTotals}>
             <CartesianGrid strokeDasharray="3 3" stroke={darkMode ? "#444" : "#ccc"} />
-            <XAxis dataKey="date" stroke={textColor} />
-            <YAxis allowDecimals={false} stroke={textColor} />
-            <Tooltip contentStyle={{ backgroundColor: boxColor, color: textColor }} labelStyle={{ color: textColor }} itemStyle={{ color: textColor }} />
+            <XAxis dataKey="date" stroke={text} />
+            <YAxis allowDecimals={false} stroke={text} />
+            <Tooltip contentStyle={{ backgroundColor: box, color: text }} labelStyle={{ color: text }} itemStyle={{ color: text }} />
             <Bar dataKey="total" fill="#8884d8" />
           </BarChart>
         </ResponsiveContainer>
@@ -85,7 +78,7 @@ export default function HistoryPage() {
         <p style={{ fontSize: "4vw" }}>記録がありません。</p>
       ) : (
         sortedDates.map((date) => (
-          <div key={date} style={{ marginBottom: "20px", background: boxColor, padding: "15px", borderRadius: "8px" }}>
+          <div key={date} style={{ marginBottom: "20px", background: box, padding: "15px", borderRadius: "8px" }}>
             <h2 style={{ fontSize: "5vw", marginBottom: "10px" }}>{date}</h2>
             {grouped[date].entries.map((entry, i) => (
               <p key={i} style={{ fontSize: "4vw" }}>
