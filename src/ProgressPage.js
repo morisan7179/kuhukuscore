@@ -7,7 +7,7 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  PieChart,
+  PieChart,　
   Pie,
   Cell,
 } from "recharts";
