@@ -10,7 +10,7 @@ export default function HistoryPage() {
     return JSON.parse(localStorage.getItem("darkMode")) || false;
   });
   const [reverse, setReverse] = useState(false);
-
+　
   const loadScores = () => {
     setScores(JSON.parse(localStorage.getItem("scores") || "[]"));
   };
