@@ -24,9 +24,7 @@ export default function HomePage() {
     return JSON.parse(localStorage.getItem("darkMode")) || false;
   });
 
-  const [selectedDate, setSelectedDate] = useState(() => {
-    return localStorage.getItem("selectedDate") || getTodayJST();
-  });
+  const [selectedDate, setSelectedDate] = useState(() => getTodayJST());
 
   useEffect(() => {
     localStorage.setItem("selectedDate", selectedDate);
@@ -48,7 +46,7 @@ export default function HomePage() {
   useEffect(() => {
     const handler = () => {
       setScores(JSON.parse(localStorage.getItem("scores") || "[]"));
-      setSelectedDate(localStorage.getItem("selectedDate") || getTodayJST());
+      setSelectedDate(getTodayJST()); // ⭐️ アプリ再開時に日付を今日に戻す
     };
     window.addEventListener("focus", handler);
     return () => window.removeEventListener("focus", handler);
