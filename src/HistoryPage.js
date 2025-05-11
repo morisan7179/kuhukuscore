@@ -3,7 +3,7 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip,
   ResponsiveContainer, CartesianGrid,
 } from "recharts";
-
+　
 export default function HistoryPage() {
   const [scores, setScores] = useState([]);
   const [darkMode, setDarkMode] = useState(() => {
