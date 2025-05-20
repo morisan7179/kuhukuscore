@@ -57,16 +57,29 @@ export default function HomePage() {
   useEffect(() => localStorage.setItem("todayScore", todayScore), [todayScore]);
   useEffect(() => localStorage.setItem("darkMode", JSON.stringify(darkMode)), [darkMode]);
 
-  const addScore = (score) => {
-    const now = new Date();
-    const time = now.toLocaleTimeString("ja-JP", { hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" });
-    const newScores = [...scores, { date: selectedDate, time, score }];
-    setScores(newScores);
-    setTotal(total + score);
-    if (selectedDate === getTodayJST()) setTodayScore(todayScore + score);
-    localStorage.setItem("scores", JSON.stringify(newScores));
-    localStorage.setItem("lastRecordedDate", getTodayJST());
-  };
+  const encouragements = [
+  "おめでとう！一歩近づいたね！",
+  "いいね！継続は力なり！",
+  "やったね！前進してるよ！",
+  "ナイス！今日も進んでる！",
+  "素敵！未来が近づいてる！"
+];
+
+const addScore = (score) => {
+  const now = new Date();
+  const time = now.toLocaleTimeString("ja-JP", { hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  const newScores = [...scores, { date: selectedDate, time, score }];
+  setScores(newScores);
+  setTotal(total + score);
+  if (selectedDate === getTodayJST()) setTodayScore(todayScore + score);
+  localStorage.setItem("scores", JSON.stringify(newScores));
+  localStorage.setItem("lastRecordedDate", getTodayJST());
+
+  // ⭐️ ランダムな励ましを表示
+  const msg = encouragements[Math.floor(Math.random() * encouragements.length)];
+  alert(msg);
+};
+
 
   const deleteEntry = (index) => {
     const entry = scores[index];
